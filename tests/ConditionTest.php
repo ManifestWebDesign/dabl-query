@@ -1,5 +1,6 @@
 <?php
 
+use Dabl\Adapter\DABLPDO;
 use Dabl\Adapter\DBMySQL;
 use Dabl\Query\Condition;
 use Dabl\Query\Query;

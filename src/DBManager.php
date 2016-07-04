@@ -8,6 +8,7 @@
  */
 
 namespace Dabl\Query;
+use Dabl\Adapter\DABLPDO;
 use Exception;
 use PDOException;
 use RuntimeException;
