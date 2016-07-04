@@ -11,8 +11,8 @@ namespace Dabl\Query;
 use Dabl\Adapter;
 use Dabl\Adapter\DABLPDO;
 use Dabl\Adapter\DBMSSQL;
-use Exception;
 use PDO;
+use PDOStatement;
 use RuntimeException;
 
 class QueryStatement {
@@ -180,7 +180,7 @@ class QueryStatement {
 		array_unshift($identifiers, $string);
 
 		if (!($string = @call_user_func_array('sprintf', $identifiers))) {
-			throw new Exception('Could not insert identifiers into query string. The number of occurances of ' . self::IDENTIFIER . ' might not match the number of identifiers.');
+			throw new RuntimeException('Could not insert identifiers into query string. The number of occurances of ' . self::IDENTIFIER . ' might not match the number of identifiers.');
 		}
 		return $string;
 	}
@@ -219,7 +219,7 @@ class QueryStatement {
 		array_unshift($params, $string);
 
 		if (!($string = @call_user_func_array('sprintf', $params))) {
-			throw new Exception('Could not insert parameters into query string. The number of ?s might not match the number of parameters.');
+			throw new RuntimeException('Could not insert parameters into query string. The number of ?s might not match the number of parameters.');
 		}
 		return $string;
 	}

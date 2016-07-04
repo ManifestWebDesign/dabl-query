@@ -167,9 +167,6 @@ class Condition {
 				$right = '(' . $clause_statement->string . ')';
 				$statement->addParams($clause_statement->params);
 				$statement->addIdentifiers($clause_statement->identifiers);
-				if ($quote !== self::QUOTE_LEFT) {
-					$quote = self::QUOTE_NONE;
-				}
 			} elseif ($is_array) {
 				$array_len = count($right);
 				// BETWEEN

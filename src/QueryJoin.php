@@ -9,7 +9,7 @@
 
 namespace Dabl\Query;
 
-use Dabl\Adapter\DABLPDO;
+use PDO;
 
 class QueryJoin {
 
@@ -176,10 +176,10 @@ class QueryJoin {
 	}
 
 	/**
-	 * @param DABLPDO $conn
+	 * @param PDO $conn
 	 * @return QueryStatement
 	 */
-	function getQueryStatement(DABLPDO $conn = null) {
+	function getQueryStatement(PDO $conn = null) {
 		$statement = new QueryStatement($conn);
 		$table = $this->_table;
 		$on_clause = $this->_onClause;

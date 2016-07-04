@@ -1,5 +1,6 @@
 <?php
 
+use Dabl\Adapter\DABLPDO;
 use Dabl\Adapter\DBMySQL;
 use Dabl\Query\Query;
 
@@ -12,7 +13,7 @@ class QueryTest extends PHPUnit_Framework_TestCase {
 
 	function setUp() {
 		try {
-			$this->pdo = DBMySQL::factory(array(
+			$this->pdo = DABLPDO::factory(array(
 				'driver' => 'mysql',
 				'host' => 'localhost',
 				'dbname' => 'test',
