@@ -8,6 +8,7 @@
  */
 
 namespace Dabl\Query;
+use Dabl\StringFormat\StringFormat;
 
 /**
  * Handles all of your paginating needs.
@@ -59,11 +60,7 @@ class QueryPager {
 		} elseif (func_num_args() < 4 && ($table = $q->getTable()) && !($table instanceof Query)) {
 			$table_parts = explode('.', $table);
 			$table_name = array_pop($table_parts);
-			if (class_exists('StringFormat')) {
-				$this->setClass(StringFormat::className($table_name));
-			} else {
-				$this->setClass(ucfirst(str_replace(array('-', '_'), '', $table_name)));
-			}
+			$this->setClass(StringFormat::className($table_name));
 		}
 		if ($select_method_name) {
 			$this->setMethod($select_method_name);
