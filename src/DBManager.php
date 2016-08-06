@@ -9,7 +9,6 @@
 
 namespace Dabl\Query;
 use Dabl\Adapter\DABLPDO;
-use Exception;
 use PDOException;
 use RuntimeException;
 
@@ -40,8 +39,8 @@ class DBManager {
 	 * @return DABLPDO[]
 	 */
 	static function getConnections() {
-		foreach (self::$parameters as $conn => $params) {
-			self::connect($conn);
+		foreach (self::$parameters as $name => $params) {
+			self::connect($name);
 		}
 		return self::$connections;
 	}
@@ -59,21 +58,21 @@ class DBManager {
 	 * Get the connection for $db_name. The returned object will be
 	 * connected to its database.
 	 *
-	 * @param String $db_name
+	 * @param String $connection_name
 	 * @return DABLPDO
 	 * @throws PDOException If the connection fails
 	 */
-	static function getConnection($db_name = null) {
-		if (null === $db_name) {
+	static function getConnection($connection_name = null) {
+		if (null === $connection_name) {
 			$keys = array_keys(self::$parameters);
-			$db_name = reset($keys);
+			$connection_name = reset($keys);
 		}
 
-		if (!@$db_name) {
+		if (!@$connection_name) {
 			return null;
 		}
 
-		return self::connect($db_name);
+		return self::connect($connection_name);
 	}
 
 	/**
@@ -89,25 +88,48 @@ class DBManager {
 	}
 
 	/**
+	 * Get the parameters for a given connection name
+	 *
+	 * @param $connection_name
+	 * @return mixed
+	 */
+	static function getParameters($connection_name) {
+		if (!array_key_exists($connection_name, self::$parameters)) {
+			throw new RuntimeException("Configuration for database '$connection_name' not loaded");
+		}
+
+		return self::$parameters[$connection_name];
+	}
+
+	/**
+	 * @param $connection_name
+	 * @param $key
+	 * @param $value
+	 */
+	static function setParameter($connection_name, $key, $value) {
+		self::$parameters[$connection_name][$key] = $value;
+	}
+
+	/**
 	 * Get the specified connection parameter from the given DB
 	 * connection.
 	 *
-	 * @param string $db_name
+	 * @param string $connection_name
 	 * @param string $key
 	 * @return string|null
-	 * @throws Exception
+	 * @throws RuntimeException
 	 */
-	static function getParameter($db_name, $key) {
+	static function getParameter($connection_name, $key) {
 		// don't reveal passwords through this interface
 		if ('password' === $key) {
 			throw new RuntimeException('DB::password is private');
 		}
 
-		if (!array_key_exists($db_name, self::$parameters)) {
-			throw new RuntimeException("Configuration for database '$db_name' not loaded");
+		if (!array_key_exists($connection_name, self::$parameters)) {
+			throw new RuntimeException("Configuration for database '$connection_name' not loaded");
 		}
 
-		return @self::$parameters[$db_name][$key];
+		return @self::$parameters[$connection_name][$key];
 	}
 
 	/**
@@ -115,32 +137,40 @@ class DBManager {
 	 *
 	 * @access private
 	 * @since 2010-10-29
-	 * @param string $key Connection name
+	 * @param string $connection_name Connection name
 	 * @return DABLPDO Database connection
 	 * @throws PDOException If the connection fails
 	 */
-	private static function connect($key) {
-		if (array_key_exists($key, self::$connections)) {
-			return self::$connections[$key];
+	private static function connect($connection_name) {
+		if (array_key_exists($connection_name, self::$connections)) {
+			return self::$connections[$connection_name];
 		}
 
-		if (!array_key_exists($key, self::$parameters)) {
-			throw new RuntimeException('Connection "' . $key . '" has not been set');
+		if (!array_key_exists($connection_name, self::$parameters)) {
+			throw new RuntimeException('Connection "' . $connection_name . '" has not been set');
 		}
 
-		$conn = DABLPDO::factory(self::$parameters[$key]);
-		return (self::$connections[$key] = $conn);
+		$conn = DABLPDO::factory(self::$parameters[$connection_name]);
+		return (self::$connections[$connection_name] = $conn);
 	}
 
 	/**
 	 * Disconnect from the database connection named $key.
 	 *
-	 * @param string $key Connection name
+	 * @param string $connection_name Connection name
 	 * @return void
 	 */
-	static function disconnect($key) {
-		self::$connections[$key] = null;
-		unset(self::$connections[$key]);
+	static function disconnect($connection_name) {
+		self::$connections[$connection_name] = null;
+		unset(self::$connections[$connection_name]);
+	}
+
+	/**
+	 * Clears parameters and references to all connections
+	 */
+	static function clearConnections() {
+		self::$connections = array();
+		self::$parameters = array();
 	}
 
 }

@@ -4,6 +4,27 @@ use Dabl\Query\DBManager;
 
 class DBManagerTest extends PHPUnit_Framework_TestCase {
 
+	public static $defaultParams = array(
+		'driver' => 'mysql',
+		'host' => 'localhost',
+		'dbname' => '',
+		'user' => 'root',
+		'password' => ''
+	);
+
+	public function setUp() {
+		parent::setUp();
+
+		DBManager::clearConnections();
+		DBManager::addConnection('default', self::$defaultParams);
+	}
+
+	public function tearDown() {
+		parent::tearDown();
+
+		DBManager::clearConnections();
+	}
+
 	/**
 	 * @covers DBManager::getConnections
 	 */
@@ -11,8 +32,12 @@ class DBManagerTest extends PHPUnit_Framework_TestCase {
 		$connections = DBManager::getConnections();
 		$this->assertInternalType('array', $connections);
 		foreach ($connections as $connection) {
-			$this->assertInstanceOf('DABLPDO', $connection);
+			$this->assertInstanceOf('\Dabl\Adapter\DABLPDO', $connection);
 		}
+	}
+
+	public function testGetParameters() {
+		$this->assertEquals(self::$defaultParams, DBManager::getParameters('default'));
 	}
 
 	/**
@@ -32,7 +57,7 @@ class DBManagerTest extends PHPUnit_Framework_TestCase {
 	public function testGetConnectionNoArgument() {
 		$connection = DBManager::getConnection();
 
-		$this->assertInstanceOf('DABLPDO', $connection);
+		$this->assertInstanceOf('\Dabl\Adapter\DABLPDO', $connection);
 
 		$connections = DBManager::getConnections();
 
@@ -42,24 +67,17 @@ class DBManagerTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * @covers DBManager::addConnection
-	 * @todo Implement testAddConnection().
 	 */
 	public function testAddConnection() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-				'This test has not been implemented yet.'
-		);
+		DBManager::addConnection('default', self::$defaultParams);
+		$this->assertEquals(self::$defaultParams, DBManager::getParameters('default'));
 	}
 
 	/**
 	 * @covers DBManager::getParameter
-	 * @todo Implement testGetParameter().
 	 */
 	public function testGetParameter() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-				'This test has not been implemented yet.'
-		);
+		$this->assertEquals('root', DBManager::getParameter('default', 'user'));
 	}
 
 	/**
