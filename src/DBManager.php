@@ -150,7 +150,7 @@ class DBManager {
 			throw new RuntimeException('Connection "' . $connection_name . '" has not been set');
 		}
 
-		$conn = DABLPDO::factory(self::$parameters[$connection_name]);
+		$conn = DABLPDO::connect(self::$parameters[$connection_name]);
 		return (self::$connections[$connection_name] = $conn);
 	}
 

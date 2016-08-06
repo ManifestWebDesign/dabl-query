@@ -15,7 +15,7 @@ class QueryJoinTest extends PHPUnit_Framework_TestCase {
 
 	function setUp() {
 		try {
-			$this->pdo = DABLPDO::factory(array(
+			$this->pdo = DABLPDO::connect(array(
 				'driver' => 'mysql',
 				'host' => 'localhost',
 				'dbname' => 'test',
