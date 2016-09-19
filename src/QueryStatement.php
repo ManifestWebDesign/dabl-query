@@ -11,6 +11,7 @@ namespace Dabl\Query;
 use Dabl\Adapter;
 use Dabl\Adapter\DABLPDO;
 use Dabl\Adapter\DBMSSQL;
+use Dabl\Adapter\DBSQLite;
 use PDO;
 use PDOStatement;
 use RuntimeException;
@@ -236,6 +237,9 @@ class QueryStatement {
 			throw new RuntimeException('bindAndExecute cannot be called on a QueryStatement without a connection.');
 		}
 		if ($conn instanceof DBMSSQL && $conn->getDriver() === 'dblib' && function_exists('mb_detect_encoding')) {
+			return $conn->query($this->__toString());
+		}
+		if ($conn instanceof DBSQLite) {
 			return $conn->query($this->__toString());
 		}
 
