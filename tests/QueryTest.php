@@ -79,6 +79,40 @@ class QueryTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * @group count
+	 * @covers Query::setColumns
+	 */
+	function testSetColumns() {
+		$q = new Query('test_table');
+		$q->setColumns(array(
+			'foo AS bar'
+		));
+		$q = $q->getQuery();
+
+		$this->assertEquals("SELECT foo AS bar\nFROM test_table", "$q");
+
+		$q = new Query('test_table');
+		$q->setColumns(array(
+			'bar' => 'foo'
+		));
+		$q = $q->getQuery();
+
+		$this->assertEquals("SELECT foo AS \"bar\"\nFROM test_table", "$q");
+	}
+
+	/**
+	 * @group count
+	 * @covers Query::setColumns
+	 */
+	function testAddColumn() {
+		$q = new Query('test_table');
+		$q->addColumn('foo', 'bar');
+		$q = $q->getQuery();
+
+		$this->assertEquals("SELECT foo AS \"bar\"\nFROM test_table", "$q");
+	}
+
+	/**
+	 * @group count
 	 * @covers Query::getQuery
 	 */
 	function testGetQueryCount() {

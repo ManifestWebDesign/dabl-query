@@ -92,57 +92,72 @@ class Query {
 	const ASC = 'ASC';
 	const DESC = 'DESC';
 
-	private $_action = self::ACTION_SELECT;
+	protected $action = self::ACTION_SELECT;
+
 	/**
 	 * @var array
 	 */
-	private $_columns = array();
+	protected $columns = array();
+
 	/**
 	 * @var mixed
 	 */
-	private $_table;
+	protected $table;
+
 	/**
 	 * @var string
 	 */
-	private $_tableAlias;
+	protected $tableAlias;
+
 	/**
 	 * @var array
 	 */
-	private $_extraTables = array();
+	protected $extraTables = array();
+
 	/**
 	 * @var QueryJoin[]
 	 */
-	private $_joins = array();
+	protected $joins = array();
+
 	/**
 	 * @var Condition
 	 */
-	private $_where;
+	protected $where;
+
 	/**
 	 * @var array
 	 */
-	private $_orders = array();
+	protected $orders = array();
+
 	/**
 	 * @var array
 	 */
-	private $_groups = array();
+	protected $groups = array();
+
 	/**
 	 * @var Condition
 	 */
-	private $_having;
+	protected $having;
+
 	/**
 	 * @var int
 	 */
-	private $_limit;
+	protected $limit;
+
 	/**
 	 * @var int
 	 */
-	private $_offset = 0;
+	protected $offset = 0;
+
 	/**
 	 * @var bool
 	 */
-	private $_distinct = false;
+	protected $distinct = false;
 
-	private $_updateColumnValues;
+	/**
+	 * @var array
+	 */
+	protected $updateColumnValues;
 
 	/**
 	 * Creates new instance of Query, parameters will be passed to the
@@ -158,14 +173,14 @@ class Query {
 	}
 
 	function __clone() {
-		if ($this->_where instanceof Condition) {
-			$this->_where = clone $this->_where;
+		if ($this->where instanceof Condition) {
+			$this->where = clone $this->where;
 		}
-		if ($this->_having instanceof Condition) {
-			$this->_having = clone $this->_having;
+		if ($this->having instanceof Condition) {
+			$this->having = clone $this->having;
 		}
-		foreach ($this->_joins as $key => $join) {
-			$this->_joins[$key] = clone $join;
+		foreach ($this->joins as $key => $join) {
+			$this->joins[$key] = clone $join;
 		}
 	}
 
@@ -184,7 +199,7 @@ class Query {
 	 * @param Bool $bool
 	 */
 	function setDistinct($bool = true) {
-		$this->_distinct = (bool) $bool;
+		$this->distinct = (bool) $bool;
 		return $this;
 	}
 
@@ -194,7 +209,7 @@ class Query {
 	 * @param $action String
 	 */
 	function setAction($action) {
-		$this->_action = strtoupper($action);
+		$this->action = strtoupper($action);
 		return $this;
 	}
 
@@ -203,7 +218,7 @@ class Query {
 	 * @return String
 	 */
 	function getAction() {
-		return $this->_action;
+		return $this->action;
 	}
 
 	/**
@@ -215,10 +230,10 @@ class Query {
 	 * @return Query
 	 */
 	function addColumn($column_name, $alias = null) {
-		if ($alias) {
-			$column_name .= ' AS "' . $alias . '"';
+		if ($alias === null || $alias === '') {
+			$alias = $column_name;
 		}
-		$this->_columns[$column_name] = $column_name;
+		$this->columns[$alias] = $column_name;
 		return $this;
 	}
 
@@ -228,7 +243,10 @@ class Query {
 	 * @return Query
 	 */
 	function setColumns($columns_array) {
-		$this->_columns = $columns_array;
+		$this->columns = array();
+		foreach ($columns_array as $alias => &$column) {
+			$this->addColumn($column, is_int($alias) ? null : $alias);
+		}
 		return $this;
 	}
 
@@ -237,7 +255,7 @@ class Query {
 	 * @return array
 	 */
 	function getColumns() {
-		return $this->_columns;
+		return $this->columns;
 	}
 
 	/**
@@ -246,7 +264,7 @@ class Query {
 	 * @return Query
 	 */
 	function setGroups($groups_array) {
-		$this->_groups = $groups_array;
+		$this->groups = $groups_array;
 		return $this;
 	}
 
@@ -255,7 +273,7 @@ class Query {
 	 * @return array
 	 */
 	function getGroups() {
-		return $this->_groups;
+		return $this->groups;
 	}
 
 	/**
@@ -289,7 +307,7 @@ class Query {
 			$this->setAlias($alias);
 		}
 
-		$this->_table = $table_name;
+		$this->table = $table_name;
 		return $this;
 	}
 
@@ -300,11 +318,11 @@ class Query {
 	 * @return String
 	 */
 	function getTable() {
-		return $this->_table;
+		return $this->table;
 	}
 
 	function setAlias($alias) {
-		$this->_tableAlias = $alias;
+		$this->tableAlias = $alias;
 		return $this;
 	}
 
@@ -315,7 +333,7 @@ class Query {
 	 * @return String
 	 */
 	function getAlias() {
-		return $this->_tableAlias;
+		return $this->tableAlias;
 	}
 
 	/**
@@ -341,7 +359,7 @@ class Query {
 			}
 		}
 
-		$this->_extraTables[$alias] = $table_name;
+		$this->extraTables[$alias] = $table_name;
 		return $this;
 	}
 
@@ -353,7 +371,7 @@ class Query {
 	 * @return Query
 	 */
 	function setWhere(Condition $w) {
-		$this->_where = $w;
+		$this->where = $w;
 		return $this;
 	}
 
@@ -364,7 +382,7 @@ class Query {
 	 * @return Condition
 	 */
 	function getWhere() {
-		return $this->_where;
+		return $this->where;
 	}
 
 	/**
@@ -378,7 +396,7 @@ class Query {
 	 */
 	function addJoin($table_or_column, $on_clause_or_column = null, $join_type = self::JOIN) {
 		if ($table_or_column instanceof QueryJoin) {
-			$this->_joins[] = clone $table_or_column;
+			$this->joins[] = clone $table_or_column;
 			return $this;
 		}
 
@@ -390,7 +408,7 @@ class Query {
 			$on_clause_or_column = '1 = 1';
 		}
 
-		$this->_joins[] = new QueryJoin($table_or_column, $on_clause_or_column, $join_type);
+		$this->joins[] = new QueryJoin($table_or_column, $on_clause_or_column, $join_type);
 		return $this;
 	}
 
@@ -463,7 +481,7 @@ class Query {
 		} else {
 			if (null === $on_clause_or_column) {
 				if ($join_type == self::JOIN || $join_type == self::INNER_JOIN) {
-					foreach ($this->_extraTables as &$table) {
+					foreach ($this->extraTables as &$table) {
 						if ($table == $table_or_column) {
 							return $this;
 						}
@@ -475,7 +493,7 @@ class Query {
 			}
 			$join = new QueryJoin($table_or_column, $on_clause_or_column, $join_type);
 		}
-		foreach ($this->_joins as &$existing_join) {
+		foreach ($this->joins as &$existing_join) {
 			if ($join->getTable() == $existing_join->getTable()) {
 				if ($join->getAlias() != $existing_join->getAlias()) {
 					// tables match, but aliases don't match
@@ -485,7 +503,7 @@ class Query {
 				return $this;
 			}
 		}
-		$this->_joins[] = $join;
+		$this->joins[] = $join;
 		return $this;
 	}
 
@@ -520,7 +538,7 @@ class Query {
 	 * @return QueryJoin[]
 	 */
 	function getJoins() {
-		return $this->_joins;
+		return $this->joins;
 	}
 
 	/**
@@ -528,7 +546,7 @@ class Query {
 	 * @return Query
 	 */
 	function setJoins($joins) {
-		$this->_joins = $joins;
+		$this->joins = $joins;
 		return $this;
 	}
 
@@ -542,9 +560,9 @@ class Query {
 	 */
 	function addAnd($column, $value = null, $operator = self::EQUAL, $quote = null) {
 		if (func_num_args() === 1) {
-			$this->_where->addAnd($column);
+			$this->where->addAnd($column);
 		} else {
-			$this->_where->addAnd($column, $value, $operator, $quote);
+			$this->where->addAnd($column, $value, $operator, $quote);
 		}
 		return $this;
 	}
@@ -567,7 +585,7 @@ class Query {
 	 * @return Query
 	 */
 	function andNot($column, $value) {
-		$this->_where->andNot($column, $value);
+		$this->where->andNot($column, $value);
 		return $this;
 	}
 
@@ -577,7 +595,7 @@ class Query {
 	 * @return Query
 	 */
 	function andLike($column, $value) {
-		$this->_where->andLike($column, $value);
+		$this->where->andLike($column, $value);
 		return $this;
 	}
 
@@ -587,7 +605,7 @@ class Query {
 	 * @return Query
 	 */
 	function andNotLike($column, $value) {
-		$this->_where->andNotLike($column, $value);
+		$this->where->andNotLike($column, $value);
 		return $this;
 	}
 
@@ -597,7 +615,7 @@ class Query {
 	 * @return Query
 	 */
 	function andGreater($column, $value) {
-		$this->_where->andGreater($column, $value);
+		$this->where->andGreater($column, $value);
 		return $this;
 	}
 
@@ -607,7 +625,7 @@ class Query {
 	 * @return Query
 	 */
 	function andGreaterEqual($column, $value) {
-		$this->_where->andGreaterEqual($column, $value);
+		$this->where->andGreaterEqual($column, $value);
 		return $this;
 	}
 
@@ -617,7 +635,7 @@ class Query {
 	 * @return Query
 	 */
 	function andLess($column, $value) {
-		$this->_where->andLess($column, $value);
+		$this->where->andLess($column, $value);
 		return $this;
 	}
 
@@ -627,7 +645,7 @@ class Query {
 	 * @return Query
 	 */
 	function andLessEqual($column, $value) {
-		$this->_where->andLessEqual($column, $value);
+		$this->where->andLessEqual($column, $value);
 		return $this;
 	}
 
@@ -636,7 +654,7 @@ class Query {
 	 * @return Query
 	 */
 	function andNull($column) {
-		$this->_where->andNull($column);
+		$this->where->andNull($column);
 		return $this;
 	}
 
@@ -645,7 +663,7 @@ class Query {
 	 * @return Query
 	 */
 	function andNotNull($column) {
-		$this->_where->andNotNull($column);
+		$this->where->andNotNull($column);
 		return $this;
 	}
 
@@ -656,7 +674,7 @@ class Query {
 	 * @return Query
 	 */
 	function andBetween($column, $from, $to) {
-		$this->_where->andBetween($column, $from, $to);
+		$this->where->andBetween($column, $from, $to);
 		return $this;
 	}
 
@@ -666,7 +684,7 @@ class Query {
 	 * @return Query
 	 */
 	function andBeginsWith($column, $value) {
-		$this->_where->andBeginsWith($column, $value);
+		$this->where->andBeginsWith($column, $value);
 		return $this;
 	}
 
@@ -676,7 +694,7 @@ class Query {
 	 * @return Query
 	 */
 	function andEndsWith($column, $value) {
-		$this->_where->andEndsWith($column, $value);
+		$this->where->andEndsWith($column, $value);
 		return $this;
 	}
 
@@ -686,7 +704,7 @@ class Query {
 	 * @return Query
 	 */
 	function andContains($column, $value) {
-		$this->_where->andContains($column, $value);
+		$this->where->andContains($column, $value);
 		return $this;
 	}
 
@@ -700,9 +718,9 @@ class Query {
 	 */
 	function addOr($column, $value = null, $operator = self::EQUAL, $quote = null) {
 		if (func_num_args() === 1) {
-			$this->_where->addOr($column);
+			$this->where->addOr($column);
 		} else {
-			$this->_where->addOr($column, $value, $operator, $quote);
+			$this->where->addOr($column, $value, $operator, $quote);
 		}
 		return $this;
 	}
@@ -713,7 +731,7 @@ class Query {
 	 * @return Query
 	 */
 	function orNot($column, $value) {
-		$this->_where->orNot($column, $value);
+		$this->where->orNot($column, $value);
 		return $this;
 	}
 
@@ -723,7 +741,7 @@ class Query {
 	 * @return Query
 	 */
 	function orLike($column, $value) {
-		$this->_where->orLike($column, $value);
+		$this->where->orLike($column, $value);
 		return $this;
 	}
 
@@ -733,7 +751,7 @@ class Query {
 	 * @return Query
 	 */
 	function orNotLike($column, $value) {
-		$this->_where->orNotLike($column, $value);
+		$this->where->orNotLike($column, $value);
 		return $this;
 	}
 
@@ -743,7 +761,7 @@ class Query {
 	 * @return Query
 	 */
 	function orGreater($column, $value) {
-		$this->_where->orGreater($column, $value);
+		$this->where->orGreater($column, $value);
 		return $this;
 	}
 
@@ -753,7 +771,7 @@ class Query {
 	 * @return Query
 	 */
 	function orGreaterEqual($column, $value) {
-		$this->_where->orGreaterEqual($column, $value);
+		$this->where->orGreaterEqual($column, $value);
 		return $this;
 	}
 
@@ -763,7 +781,7 @@ class Query {
 	 * @return Query
 	 */
 	function orLess($column, $value) {
-		$this->_where->orLess($column, $value);
+		$this->where->orLess($column, $value);
 		return $this;
 	}
 
@@ -773,7 +791,7 @@ class Query {
 	 * @return Query
 	 */
 	function orLessEqual($column, $value) {
-		$this->_where->orLessEqual($column, $value);
+		$this->where->orLessEqual($column, $value);
 		return $this;
 	}
 
@@ -782,7 +800,7 @@ class Query {
 	 * @return Query
 	 */
 	function orNull($column) {
-		$this->_where->orNull($column);
+		$this->where->orNull($column);
 		return $this;
 	}
 
@@ -791,7 +809,7 @@ class Query {
 	 * @return Query
 	 */
 	function orNotNull($column) {
-		$this->_where->orNotNull($column);
+		$this->where->orNotNull($column);
 		return $this;
 	}
 
@@ -802,7 +820,7 @@ class Query {
 	 * @return Query
 	 */
 	function orBetween($column, $from, $to) {
-		$this->_where->orBetween($column, $from, $to);
+		$this->where->orBetween($column, $from, $to);
 		return $this;
 	}
 
@@ -812,7 +830,7 @@ class Query {
 	 * @return Query
 	 */
 	function orBeginsWith($column, $value) {
-		$this->_where->orBeginsWith($column, $value);
+		$this->where->orBeginsWith($column, $value);
 		return $this;
 	}
 
@@ -822,7 +840,7 @@ class Query {
 	 * @return Query
 	 */
 	function orEndsWith($column, $value) {
-		$this->_where->orEndsWith($column, $value);
+		$this->where->orEndsWith($column, $value);
 		return $this;
 	}
 
@@ -832,7 +850,7 @@ class Query {
 	 * @return Query
 	 */
 	function orContains($column, $value) {
-		$this->_where->orContains($column, $value);
+		$this->where->orContains($column, $value);
 		return $this;
 	}
 
@@ -841,7 +859,7 @@ class Query {
 	 * @return Query
 	 */
 	function groupBy($column) {
-		$this->_groups[] = $column;
+		$this->groups[] = $column;
 		return $this;
 	}
 
@@ -868,7 +886,7 @@ class Query {
 	 * @param $w Condition
 	 */
 	function setHaving(Condition $where) {
-		$this->_having = $where;
+		$this->having = $where;
 		return $this;
 	}
 
@@ -877,7 +895,7 @@ class Query {
 	 * @return Condition
 	 */
 	function getHaving() {
-		return $this->_having;
+		return $this->having;
 	}
 
 	/**
@@ -892,12 +910,12 @@ class Query {
 			}
 			$column .= ' ' . $dir;
 		}
-		$this->_orders[] = trim($column);
+		$this->orders[] = trim($column);
 		return $this;
 	}
 
 	function removeOrderBys() {
-		$this->_orders = array();
+		$this->orders = array();
 		return $this;
 	}
 
@@ -927,7 +945,7 @@ class Query {
 		if (null !== $limit) {
 			$limit = (int) $limit;
 		}
-		$this->_limit = $limit;
+		$this->limit = $limit;
 		return $this;
 	}
 
@@ -936,7 +954,7 @@ class Query {
 	 * @return int
 	 */
 	function getLimit() {
-		return $this->_limit;
+		return $this->limit;
 	}
 
 	/**
@@ -946,8 +964,15 @@ class Query {
 	 * @param $offset Int
 	 */
 	function setOffset($offset) {
-		$this->_offset = (int) $offset;
+		$this->offset = (int) $offset;
 		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	function getOffset() {
+		return $this->offset;
 	}
 
 	/**
@@ -967,7 +992,7 @@ class Query {
 		// the string $statement will use
 		$qry_s = '';
 
-		$action = $this->_action;
+		$action = $this->action;
 
 		switch ($action) {
 			default:
@@ -991,8 +1016,8 @@ class Query {
 		$stmnt->addParams($table_stmnt->params);
 		$qry_s .= $table_stmnt->string;
 
-		if ($this->_joins) {
-			foreach ($this->_joins as $join) {
+		if ($this->joins) {
+			foreach ($this->joins as $join) {
 				$join_stmnt = $join->getQueryStatement($conn);
 				$qry_s .= "\n\t" . $join_stmnt->string;
 				$stmnt->addParams($join_stmnt->params);
@@ -1001,13 +1026,13 @@ class Query {
 		}
 
 		if (self::ACTION_UPDATE === $action) {
-			if (empty($this->_updateColumnValues)) {
+			if (empty($this->updateColumnValues)) {
 				throw new RuntimeException('Unable to build UPDATE query without update column values');
 			}
 
 			$column_updates = array();
 
-			foreach ($this->_updateColumnValues as $column_name => &$column_value) {
+			foreach ($this->updateColumnValues as $column_name => &$column_value) {
 				$column_updates[] = QueryStatement::IDENTIFIER . '=' . QueryStatement::PARAM;
 				$stmnt->addIdentifier($column_name);
 				$stmnt->addParam($column_value);
@@ -1023,7 +1048,7 @@ class Query {
 			$stmnt->addIdentifiers($where_stmnt->identifiers);
 		}
 
-		if ($this->_groups) {
+		if ($this->groups) {
 			$clause = $this->getGroupByClause();
 			$stmnt->addIdentifiers($clause->identifiers);
 			$stmnt->addParams($clause->params);
@@ -1039,22 +1064,22 @@ class Query {
 			}
 		}
 
-		if ($action !== self::ACTION_COUNT && $this->_orders) {
+		if ($action !== self::ACTION_COUNT && $this->orders) {
 			$clause = $this->getOrderByClause();
 			$stmnt->addIdentifiers($clause->identifiers);
 			$stmnt->addParams($clause->params);
 			$qry_s .= $clause->string;
 		}
 
-		if (null !== $this->_limit) {
+		if (null !== $this->limit) {
 			if ($conn) {
 				if (class_exists('DBMSSQL') && $conn instanceof DBMSSQL) {
 					$qry_s = QueryStatement::embedIdentifiers($qry_s, $stmnt->getIdentifiers(), $conn);
 					$stmnt->setIdentifiers(array());
 				}
-				$conn->applyLimit($qry_s, $this->_offset, $this->_limit);
+				$conn->applyLimit($qry_s, $this->offset, $this->limit);
 			} else {
-				$qry_s .= "\nLIMIT " . ($this->_offset ? $this->_offset . ', ' : '') . $this->_limit;
+				$qry_s .= "\nLIMIT " . ($this->offset ? $this->offset . ', ' : '') . $this->limit;
 			}
 		}
 
@@ -1088,7 +1113,7 @@ class Query {
 			$table_statement = null;
 		}
 
-		switch ($this->_action) {
+		switch ($this->action) {
 			case self::ACTION_UPDATE:
 			case self::ACTION_COUNT:
 			case self::ACTION_SELECT:
@@ -1112,9 +1137,9 @@ class Query {
 				}
 
 				// setup identifiers for any additional tables
-				if ($this->_extraTables) {
+				if ($this->extraTables) {
 					$table_string = '(' . $table_string;
-					foreach ($this->_extraTables as $t_alias => $extra_table) {
+					foreach ($this->extraTables as $t_alias => $extra_table) {
 						if ($extra_table instanceof Query) {
 							$extra_table_statement = $extra_table->getQuery($conn);
 							$extra_table_string = '(' . $extra_table_statement->string . ') AS ' . $t_alias;
@@ -1157,7 +1182,7 @@ class Query {
 				$statement->string = $table_string;
 				break;
 			default:
-				throw new RuntimeException('Uknown action "' . $this->_action . '", cannot build table list');
+				throw new RuntimeException('Uknown action "' . $this->action . '", cannot build table list');
 				break;
 		}
 		return $statement;
@@ -1169,10 +1194,10 @@ class Query {
 	 * @return bool
 	 */
 	protected function hasAggregates() {
-		if ($this->_groups) {
+		if ($this->groups) {
 			return true;
 		}
-		foreach ($this->_columns as $column) {
+		foreach ($this->columns as $column) {
 			if (strpos($column, '(') !== false) {
 				return true;
 			}
@@ -1186,8 +1211,8 @@ class Query {
 	 */
 	protected function needsComplexCount() {
 		return $this->hasAggregates()
-		|| null !== $this->_having
-		|| $this->_distinct;
+			|| null !== $this->having
+			|| $this->distinct;
 	}
 
 	/**
@@ -1203,7 +1228,7 @@ class Query {
 
 		$statement = new QueryStatement($conn);
 		$alias = $this->getAlias();
-		$action = $this->_action;
+		$action = $this->action;
 
 		if ($action == self::ACTION_DELETE) {
 			return $statement;
@@ -1216,8 +1241,8 @@ class Query {
 			}
 
 			if (null === $this->getHaving()) {
-				if ($this->_groups) {
-					$groups = $this->_groups;
+				if ($this->groups) {
+					$groups = $this->groups;
 					foreach ($groups as &$group) {
 						$statement->addIdentifier($group);
 						$group = QueryStatement::IDENTIFIER;
@@ -1226,14 +1251,19 @@ class Query {
 					return $statement;
 				}
 
-				if (!$this->_distinct && $this->_columns) {
+				if (!$this->distinct && $this->columns) {
 					$columns_to_use = array();
-					foreach ($this->_columns as $column) {
+					foreach ($this->columns as $alias => $column) {
 						if (strpos($column, '(') === false) {
 							continue;
 						}
+						if ($alias === $column) {
+							$alias = '';
+						} else {
+							$alias = ' AS "' . $alias . '"';
+						}
 						$statement->addIdentifier($column);
-						$columns_to_use[] = QueryStatement::IDENTIFIER;
+						$columns_to_use[] = QueryStatement::IDENTIFIER . $alias;
 					}
 					if ($columns_to_use) {
 						$statement->string = implode(', ', $columns_to_use);
@@ -1244,11 +1274,17 @@ class Query {
 		}
 
 		// setup $columns_string
-		if ($this->_columns) {
-			$columns = $this->_columns;
-			foreach ($columns as &$column) {
+		if ($this->columns) {
+			$columns = $this->columns;
+			foreach ($columns as $alias => &$column) {
+				if ($alias === $column) {
+					$alias = '';
+				} else {
+					$alias = ' AS "' . $alias . '"';
+				}
+
 				$statement->addIdentifier($column);
-				$column = QueryStatement::IDENTIFIER;
+				$column = QueryStatement::IDENTIFIER . $alias;
 			}
 			$columns_string = implode(', ', $columns);
 		} elseif ($alias) {
@@ -1260,7 +1296,7 @@ class Query {
 			$statement->addIdentifier($table);
 		}
 
-		if ($this->_distinct) {
+		if ($this->distinct) {
 			$columns_string = "DISTINCT $columns_string";
 		}
 
@@ -1282,7 +1318,7 @@ class Query {
 	 */
 	protected function getOrderByClause($conn = null) {
 		$statement = new QueryStatement($conn);
-		$orders = $this->_orders;
+		$orders = $this->orders;
 		foreach ($orders as &$order) {
 			$order_parts = explode(' ', $order);
 			if (count($order_parts) == 1 || count($order_parts) == 2) {
@@ -1301,8 +1337,8 @@ class Query {
 	 */
 	protected function getGroupByClause($conn = null) {
 		$statement = new QueryStatement($conn);
-		if ($this->_groups) {
-			$groups = $this->_groups;
+		if ($this->groups) {
+			$groups = $this->groups;
 			foreach ($groups as &$group) {
 				$statement->addIdentifier($group);
 				$group = QueryStatement::IDENTIFIER;
@@ -1378,7 +1414,7 @@ class Query {
 	 * @return Query
 	 */
 	function setUpdateColumnValues(array $column_values) {
-		$this->_updateColumnValues = &$column_values;
+		$this->updateColumnValues = &$column_values;
 		return $this;
 	}
 
@@ -1391,7 +1427,7 @@ class Query {
 	function doUpdate(array $column_values, PDO $conn = null) {
 		$q = clone $this;
 
-		$q->_updateColumnValues = &$column_values;
+		$q->updateColumnValues = &$column_values;
 
 		if (!$q->getTable()) {
 			throw new RuntimeException('No table specified.');
@@ -1400,4 +1436,5 @@ class Query {
 		$q->setAction(self::ACTION_UPDATE);
 		return (int) $q->getQuery($conn)->bindAndExecute()->rowCount();
 	}
+
 }
