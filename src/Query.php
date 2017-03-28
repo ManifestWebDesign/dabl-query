@@ -42,6 +42,7 @@ class Query {
 	const IS_NULL = 'IS NULL';
 	const IS_NOT_NULL = 'IS NOT NULL';
 	const BETWEEN = 'BETWEEN';
+	const NOOP = null;
 
 	// Comparison type for update
 	const CUSTOM_EQUAL = 'CUSTOM_EQUAL';
@@ -934,6 +935,14 @@ class Query {
 	 */
 	final function addOrder($column, $dir = null) {
 		return $this->orderBy($column, $dir);
+	}
+
+	/**
+	 * Returns all ORDER BY columns as strings in the form of "COLUMN DIRECTION"
+	 * @return Array
+	 */
+	function getOrders() {
+		return $this->orders;
 	}
 
 	/**
