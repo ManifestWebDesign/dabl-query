@@ -240,6 +240,9 @@ class QueryPager {
 	 * Gets the total number of pages
 	 */
 	function getPageCount() {
+		if (!$this->limit) {
+			return 1;
+		}
 		$rem = ($this->getTotal() % $this->limit);
 		$rem = ($rem >= 0) ? $rem : 0;
 		$total_pages = ($this->getTotal() - $rem) / $this->limit;
