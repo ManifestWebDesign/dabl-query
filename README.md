@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/ManifestWebDesign/dabl-query.svg?branch=master)](https://travis-ci.org/ManifestWebDesign/dabl-query)
+
 # DABL Query
 Lightweight object-oriented SQL query builder
 
