@@ -86,6 +86,11 @@ class Condition {
 
 		$statement = new QueryStatement;
 
+		if (1 === func_num_args() && is_string($left)) {
+			$statement->string = $left;
+			return $statement;
+		}
+
 		// Left can be a Condition
 		if ($left instanceof self) {
 			$clause_statement = $left->getQueryStatement();
@@ -195,7 +200,7 @@ class Condition {
 				}
 			}
 		} else {
-			if (null === $right && $operator !== Query::NOOP) {
+			if (null === $right) {
 				if ($operator === Query::NOT_EQUAL || $operator === Query::ALT_NOT_EQUAL) {
 					// IS NOT NULL
 					$operator = Query::IS_NOT_NULL;
@@ -205,7 +210,7 @@ class Condition {
 				}
 			}
 
-			if ($operator === Query::IS_NULL || $operator === Query::IS_NOT_NULL || $operator === Query::NOOP) {
+			if ($operator === Query::IS_NULL || $operator === Query::IS_NOT_NULL) {
 				$right = null;
 			} elseif ($quote === self::QUOTE_RIGHT || $quote == self::QUOTE_BOTH) {
 				$statement->addParam($right);

@@ -42,7 +42,6 @@ class Query {
 	const IS_NULL = 'IS NULL';
 	const IS_NOT_NULL = 'IS NOT NULL';
 	const BETWEEN = 'BETWEEN';
-	const NOOP = null;
 
 	// Comparison type for update
 	const CUSTOM_EQUAL = 'CUSTOM_EQUAL';
@@ -86,8 +85,7 @@ class Query {
 		self::ILIKE,
 		self::NOT_ILIKE,
 		self::BINARY_AND,
-		self::BINARY_OR,
-		self::NOOP
+		self::BINARY_OR
 	);
 
 	// 'Order by' qualifiers

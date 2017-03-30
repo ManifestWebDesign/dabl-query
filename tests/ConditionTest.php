@@ -45,6 +45,8 @@ class ConditionTest extends PHPUnit_Framework_TestCase {
 		// shouldn't do anything
 		$c->add(null);
 
+		$c->add('EXISTS (SELECT 1 FROM foobar)');
+
 		$stmnt = $c->getQueryStatement();
 		$stmnt->setConnection($this->pdo);
 
@@ -55,7 +57,8 @@ class ConditionTest extends PHPUnit_Framework_TestCase {
 	OR `do` = 'stuff'
 	OR (
 	`bah` = 'blacksheep'
-	OR `empty` IS NULL )";
+	OR `empty` IS NULL )
+	AND EXISTS (SELECT 1 FROM foobar)";
 		$this->assertEquals($q, $stmnt->__toString());
 	}
 
