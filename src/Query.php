@@ -86,7 +86,8 @@ class Query {
 		self::ILIKE,
 		self::NOT_ILIKE,
 		self::BINARY_AND,
-		self::BINARY_OR
+		self::BINARY_OR,
+		self::NOOP
 	);
 
 	// 'Order by' qualifiers

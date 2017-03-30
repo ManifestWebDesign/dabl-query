@@ -195,7 +195,7 @@ class Condition {
 				}
 			}
 		} else {
-			if (null === $right) {
+			if (null === $right && $operator !== Query::NOOP) {
 				if ($operator === Query::NOT_EQUAL || $operator === Query::ALT_NOT_EQUAL) {
 					// IS NOT NULL
 					$operator = Query::IS_NOT_NULL;
@@ -205,7 +205,7 @@ class Condition {
 				}
 			}
 
-			if ($operator === Query::IS_NULL || $operator === Query::IS_NOT_NULL) {
+			if ($operator === Query::IS_NULL || $operator === Query::IS_NOT_NULL || $operator === Query::NOOP) {
 				$right = null;
 			} elseif ($quote === self::QUOTE_RIGHT || $quote == self::QUOTE_BOTH) {
 				$statement->addParam($right);
