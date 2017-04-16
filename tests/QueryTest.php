@@ -30,20 +30,20 @@ class QueryTest extends PHPUnit_Framework_TestCase {
 	 * @group select
 	 * @covers Query::select
 	 */
-	function testSelect() {
-		$q = Query::select(array('bar' => 'foo'))
-			->from('test_table')
-			->where('foo', Query::EQUAL, 3)
-			->getQuery();
-
-		$this->assertEquals("SELECT foo AS \"bar\"\nFROM test_table\nWHERE \n\tfoo = 3", "$q");
-
-		$q = Query::select('foo')
-			->from('test_table')
-			->getQuery();
-
-		$this->assertEquals("SELECT foo\nFROM test_table", "$q");
-	}
+//	function testSelect() {
+//		$q = Query::select(array('bar' => 'foo'))
+//			->from('test_table')
+//			->where('foo', Query::EQUAL, 3)
+//			->getQuery();
+//
+//		$this->assertEquals("SELECT foo AS \"bar\"\nFROM test_table\nWHERE \n\tfoo = 3", "$q");
+//
+//		$q = Query::select('foo')
+//			->from('test_table')
+//			->getQuery();
+//
+//		$this->assertEquals("SELECT foo\nFROM test_table", "$q");
+//	}
 
 	/**
 	 * @group count

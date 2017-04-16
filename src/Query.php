@@ -194,33 +194,33 @@ class Query {
 		return new self($table_name, $alias);
 	}
 
-	/**
-	 * @param array $columns
-	 * @return Query
-	 */
-	static function select($columns) {
-		return static::create()
-			->setAction(Query::ACTION_SELECT)
-			->setColumns($columns);
-	}
-
-	/**
-	 * @param array $columns
-	 * @return Query
-	 */
-	static function count($columns) {
-		return static::create()
-			->setAction(Query::ACTION_COUNT)
-			->setColumns($columns);
-	}
-
-	/**
-	 * @return Query
-	 */
-	static function delete() {
-		return static::create()
-			->setAction(Query::ACTION_DELETE);
-	}
+//	/**
+//	 * @param array $columns
+//	 * @return Query
+//	 */
+//	static function select($columns) {
+//		return static::create()
+//			->setAction(Query::ACTION_SELECT)
+//			->setColumns($columns);
+//	}
+//
+//	/**
+//	 * @param array $columns
+//	 * @return Query
+//	 */
+//	static function count($columns) {
+//		return static::create()
+//			->setAction(Query::ACTION_COUNT)
+//			->setColumns($columns);
+//	}
+//
+//	/**
+//	 * @return Query
+//	 */
+//	static function delete() {
+//		return static::create()
+//			->setAction(Query::ACTION_DELETE);
+//	}
 
 	/**
 	 * Specify whether to select only distinct rows
