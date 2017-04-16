@@ -195,6 +195,34 @@ class Query {
 	}
 
 	/**
+	 * @param array $columns
+	 * @return Query
+	 */
+	static function select($columns) {
+		return static::create()
+			->setAction(Query::ACTION_SELECT)
+			->setColumns($columns);
+	}
+
+	/**
+	 * @param array $columns
+	 * @return Query
+	 */
+	static function count($columns) {
+		return static::create()
+			->setAction(Query::ACTION_COUNT)
+			->setColumns($columns);
+	}
+
+	/**
+	 * @return Query
+	 */
+	static function delete() {
+		return static::create()
+			->setAction(Query::ACTION_DELETE);
+	}
+
+	/**
 	 * Specify whether to select only distinct rows
 	 * @param Bool $bool
 	 */
@@ -239,12 +267,21 @@ class Query {
 
 	/**
 	 * Set array of strings of columns to be selected
-	 * @param array $columns_array
+	 * @param array $columns
 	 * @return Query
 	 */
-	function setColumns($columns_array) {
+	function setColumns($columns) {
 		$this->columns = array();
-		foreach ($columns_array as $alias => &$column) {
+
+		if ($columns === null) {
+			return $this;
+		}
+
+		if (is_string($columns)) {
+			return $this->addColumn($columns);
+		}
+
+		foreach ($columns as $alias => &$column) {
 			$this->addColumn($column, is_int($alias) ? null : $alias);
 		}
 		return $this;
@@ -312,6 +349,16 @@ class Query {
 	}
 
 	/**
+	 * Alias of setTable
+	 * @param string $table_name
+	 * @param string $alias
+	 * @return Query
+	 */
+	function from($table_name = null, $alias = null) {
+		return $this->setTable($table_name, $alias);
+	}
+
+	/**
 	 * Returns a String representation of the table being queried,
 	 * NOT including its alias.
 	 *
@@ -337,8 +384,8 @@ class Query {
 	}
 
 	/**
-	 * @param type $table_name
-	 * @param type $alias
+	 * @param string $table_name
+	 * @param string $alias
 	 * @return Query
 	 * @throws RuntimeException
 	 */
@@ -577,6 +624,17 @@ class Query {
 		} else {
 			return $this->addAnd($column, $value, $operator, $quote);
 		}
+	}
+
+	/**
+	 * Alias of {@link addAnd()}, but with $right and $operator switched
+	 * @return Query
+	 */
+	function where($left, $operator = Query::EQUAL, $right = null, $quote = null) {
+		if (func_num_args() === 1) {
+			return $this->addAnd($left);
+		}
+		return $this->addAnd($left, $right, $operator, $quote);
 	}
 
 	/**
@@ -938,7 +996,7 @@ class Query {
 
 	/**
 	 * Returns all ORDER BY columns as strings in the form of "COLUMN DIRECTION"
-	 * @return Array
+	 * @return array
 	 */
 	function getOrders() {
 		return $this->orders;
@@ -1119,6 +1177,7 @@ class Query {
 			$table_string = '(' . $table_statement->string . ')';
 		} else {
 			$table_statement = null;
+			$table_string = '';
 		}
 
 		switch ($this->action) {
@@ -1401,7 +1460,7 @@ class Query {
 
 	/**
 	 * Executes SELECT query and returns a result set.
-	 * @return PDOStatement
+	 * @return \PDOStatement
 	 * @param $conn PDO[optional]
 	 */
 	function doSelect(PDO $conn = null) {

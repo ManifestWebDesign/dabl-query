@@ -238,6 +238,17 @@ class Condition {
 	}
 
 	/**
+	 * Alias of addAnd, but with $right and $operator switched
+	 * @return Condition
+	 */
+	function where($left, $operator = Query::EQUAL, $right = null, $quote = null) {
+		if (func_num_args() === 1) {
+			return $this->addAnd($left);
+		}
+		return $this->addAnd($left, $right, $operator, $quote);
+	}
+
+	/**
 	 * Adds an "AND" condition to the array of conditions.
 	 * @param $left mixed
 	 * @param $right mixed[optional]
