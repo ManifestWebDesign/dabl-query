@@ -81,7 +81,7 @@ class DBManager {
 	 * manager.
 	 *
 	 * @param string $connection_name Name for the connection
-	 * @param string $connection_params Parameters for the connection
+	 * @param array $connection_params Parameters for the connection
 	 */
 	static function addConnection($connection_name, $connection_params) {
 		self::$parameters[$connection_name] = $connection_params;
